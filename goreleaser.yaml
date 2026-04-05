@@ -1,0 +1,95 @@
+# goreleaser.yaml — Scryve multi-platform release configuration
+# Docs: https://goreleaser.com/customization/
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+
+builds:
+  - id: scryve
+    main: .
+    binary: scryve
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    # Inject version metadata via ldflags (matches Makefile).
+    ldflags:
+      - -s -w
+      - -X github.com/scryve/scryve/cmd.Version={{ .Version }}
+      - -X github.com/scryve/scryve/cmd.Commit={{ .ShortCommit }}
+      - -X github.com/scryve/scryve/cmd.Date={{ .Date }}
+    flags:
+      - -trimpath
+
+archives:
+  - id: scryve-archive
+    builds:
+      - scryve
+    name_template: "scryve_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - LICENSE
+      - README.md
+
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - "^ci:"
+      - "Merge pull request"
+      - "Merge branch"
+  groups:
+    - title: "New Features"
+      regexp: "^feat"
+      order: 0
+    - title: "Bug Fixes"
+      regexp: "^fix"
+      order: 1
+    - title: "Security"
+      regexp: "^security"
+      order: 2
+    - title: "Other"
+      order: 999
+
+release:
+  github:
+    owner: scryve
+    name: scryve
+  draft: false
+  prerelease: auto
+  name_template: "Scryve {{ .Version }}"
+
+brews:
+  - name: scryve
+    tap:
+      owner: scryve
+      name: homebrew-tap
+    folder: Formula
+    homepage: "https://github.com/scryve/scryve"
+    description: "Domain-in, compliance-report-out security scanner"
+    license: "MIT"
+    install: |
+      bin.install "scryve"
+    test: |
+      system "#{bin}/scryve version"

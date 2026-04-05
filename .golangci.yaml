@@ -1,0 +1,50 @@
+# .golangci.yaml — golangci-lint configuration for Scryve
+# Docs: https://golangci-lint.run/usage/configuration/
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+
+linters:
+  enable:
+    - errcheck       # check that errors are handled
+    - gosimple       # simplify code
+    - govet          # go vet checks
+    - ineffassign    # detect ineffectual assignments
+    - staticcheck    # go staticcheck
+    - unused         # check for unused code
+    - gofmt          # formatting
+    - goimports      # import ordering
+    - gocritic       # opinionated checks
+    - misspell       # spelling
+    - bodyclose      # http response body close
+    - noctx          # http requests without context
+
+linters-settings:
+  govet:
+    enable:
+      - shadow
+  gofmt:
+    simplify: true
+  goimports:
+    local-prefixes: github.com/scryve/scryve
+  misspell:
+    locale: US
+  gocritic:
+    disabled-checks:
+      - ifElseChain
+      - unlambda
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - errcheck
+        - govet
+        - gosimple
+        - gocritic
+    # Allow shadow in main code for now (err shadowing is common in Go)
+    - linters:
+        - govet
+      text: "shadow"
+  max-issues-per-linter: 0
+  max-same-issues: 0

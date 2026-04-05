@@ -1,0 +1,191 @@
+framework: pci-dss-4.0
+version: "4.0"
+description: "Payment Card Industry Data Security Standard v4.0"
+
+controls:
+  # Requirement 1: Install and Maintain Network Security Controls
+  - id: "1.3.1"
+    title: "Inbound traffic to the cardholder data environment is restricted"
+    description: "Restrict inbound traffic to only that which is necessary."
+    cwes: ["CWE-284"]
+
+  - id: "1.3.2"
+    title: "Outbound traffic from the cardholder data environment is restricted"
+    description: "Restrict outbound traffic to only that which is necessary."
+    cwes: ["CWE-284", "CWE-668"]
+
+  - id: "1.4.1"
+    title: "Network security controls are implemented between trusted and untrusted networks"
+    description: "NSCs are implemented on any trusted/untrusted network connections."
+    cwes: ["CWE-923"]
+
+  # Requirement 2: Apply Secure Configurations to All System Components
+  - id: "2.2.1"
+    title: "Configuration standards are developed for all system components"
+    description: "Secure configuration standards are defined and applied."
+    cwes: ["CWE-16", "CWE-1188"]
+
+  - id: "2.2.6"
+    title: "System security parameters are configured to prevent misuse"
+    description: "Unnecessary services, protocols, daemons, and features are removed or disabled."
+    cwes: ["CWE-16", "CWE-532"]
+
+  - id: "2.2.7"
+    title: "All non-console administrative access is encrypted"
+    description: "All non-console administrative access is encrypted using strong cryptography."
+    cwes: ["CWE-319", "CWE-311"]
+
+  # Requirement 3: Protect Stored Account Data
+  - id: "3.3.1"
+    title: "SAD is not retained after authorization"
+    description: "Sensitive authentication data (SAD) is not retained after authorization."
+    cwes: ["CWE-312", "CWE-313"]
+
+  - id: "3.5.1"
+    title: "Primary account numbers are secured"
+    description: "PAN is secured with strong cryptography wherever stored."
+    cwes: ["CWE-311", "CWE-312", "CWE-326", "CWE-327"]
+
+  # Requirement 4: Protect Cardholder Data with Strong Cryptography During Transmission
+  - id: "4.2.1"
+    title: "Strong cryptography is used to safeguard PAN during transmission over open, public networks"
+    description: "Strong cryptography is used and security protocols are implemented to safeguard PAN during transmission over open networks. Includes TLS, email security (SPF/DKIM/DMARC)."
+    cwes: ["CWE-319", "CWE-326", "CWE-327", "CWE-295", "CWE-757"]
+
+  - id: "4.2.2"
+    title: "PAN is secured with strong cryptography when sent via end-user messaging technologies"
+    description: "PAN is secured when sent via email, instant messaging, SMS, etc."
+    cwes: ["CWE-319", "CWE-311"]
+
+  # Requirement 5: Protect All Systems and Networks from Malicious Software
+  - id: "5.2.1"
+    title: "An anti-malware solution is deployed on all system components"
+    description: "Anti-malware software is deployed on all system components."
+    cwes: ["CWE-494"]
+
+  - id: "5.3.3"
+    title: "Anti-malware mechanisms are kept current via automatic updates"
+    description: "Anti-malware solution updates are kept current."
+    cwes: ["CWE-1104"]
+
+  # Requirement 6: Develop and Maintain Secure Systems and Software
+  - id: "6.2.4"
+    title: "Software engineering techniques or other methods are defined and in use to prevent or mitigate common software attacks"
+    description: "Prevents injection flaws, XSS, broken access control, insecure deserialization, SSRF, XXE, and CSRF."
+    cwes: ["CWE-79", "CWE-89", "CWE-78", "CWE-22", "CWE-352", "CWE-502", "CWE-611", "CWE-918", "CWE-94", "CWE-77", "CWE-20", "CWE-116"]
+
+  - id: "6.3.1"
+    title: "Security vulnerabilities are identified and managed"
+    description: "Security vulnerabilities in bespoke and custom software are identified and addressed. Maps to all CVE findings."
+    cwes: []
+
+  - id: "6.3.2"
+    title: "An inventory of bespoke and custom software is maintained"
+    description: "Inventory of all bespoke and custom software is maintained to facilitate vulnerability and patch management."
+    cwes: ["CWE-1035"]
+
+  - id: "6.3.3"
+    title: "All software components are protected from known vulnerabilities"
+    description: "All software is protected from known vulnerabilities by installing applicable security patches."
+    cwes: ["CWE-1104", "CWE-937"]
+
+  - id: "6.4.1"
+    title: "Public-facing web applications are protected against attacks"
+    description: "Public-facing web applications are protected via WAF or similar. Addresses XSS, SQL injection, and related web attacks."
+    cwes: ["CWE-79", "CWE-89", "CWE-601", "CWE-200", "CWE-209"]
+
+  - id: "6.4.2"
+    title: "Public-facing web applications are protected against automated attacks"
+    description: "An automated technical solution is deployed that can detect and prevent web-based attacks including CSRF and automated abuse."
+    cwes: ["CWE-352", "CWE-307", "CWE-799"]
+
+  - id: "6.4.3"
+    title: "All payment page scripts that are loaded and executed in the consumer's browser are managed"
+    description: "Scripts on payment pages are inventoried, justified, and their integrity is ensured."
+    cwes: ["CWE-829", "CWE-693"]
+
+  # Requirement 7: Restrict Access to System Components and Cardholder Data by Business Need to Know
+  - id: "7.2.1"
+    title: "An access control model is defined and includes granting of access"
+    description: "All access to system components and cardholder data is assigned based on business need to know."
+    cwes: ["CWE-284", "CWE-732", "CWE-269"]
+
+  - id: "7.3.1"
+    title: "All user accounts and related access privileges are reviewed at least once every six months"
+    description: "User accounts and access privileges are reviewed periodically."
+    cwes: ["CWE-613", "CWE-285"]
+
+  # Requirement 8: Identify Users and Authenticate Access to System Components
+  - id: "8.2.1"
+    title: "All user IDs and authentication credentials are managed"
+    description: "Policies and procedures for user ID and authentication management are in place."
+    cwes: ["CWE-287", "CWE-306"]
+
+  - id: "8.3.6"
+    title: "If passwords/passphrases are used as authentication factors, they meet a minimum length of at least 12 characters"
+    description: "Passwords conform to minimum complexity and length requirements."
+    cwes: ["CWE-521", "CWE-307", "CWE-798"]
+
+  - id: "8.4.2"
+    title: "MFA is implemented for all access into the CDE"
+    description: "Multi-factor authentication is required for all access into the cardholder data environment."
+    cwes: ["CWE-308", "CWE-287"]
+
+  - id: "8.6.1"
+    title: "System/application accounts and related access privileges are managed"
+    description: "System and application accounts are managed via a formal process."
+    cwes: ["CWE-798", "CWE-259", "CWE-321"]
+
+  # Requirement 9: Restrict Physical Access to Cardholder Data
+  - id: "9.4.1"
+    title: "All media with cardholder data is physically secured"
+    description: "All media containing cardholder data is physically secured."
+    cwes: ["CWE-285"]
+
+  # Requirement 10: Log and Monitor All Access to System Components and Cardholder Data
+  - id: "10.2.1"
+    title: "Audit logs capture all individual user access to cardholder data"
+    description: "Audit logs capture all access to cardholder data."
+    cwes: ["CWE-778", "CWE-223"]
+
+  - id: "10.3.2"
+    title: "Audit log files are protected to prevent modifications"
+    description: "Audit log files are protected against destruction and unauthorized modifications."
+    cwes: ["CWE-532", "CWE-117", "CWE-778"]
+
+  # Requirement 11: Test Security of Systems and Networks Regularly
+  - id: "11.3.1"
+    title: "Internal vulnerability scans are performed"
+    description: "Internal vulnerability scans are performed at least once every three months."
+    cwes: []
+
+  - id: "11.3.2"
+    title: "External vulnerability scans are performed"
+    description: "External vulnerability scans are performed at least once every three months by a PCI SSC Approved Scanning Vendor."
+    cwes: []
+
+  - id: "11.4.1"
+    title: "A penetration testing methodology is defined, documented, and implemented"
+    description: "Penetration testing is performed at least annually and after significant changes."
+    cwes: []
+
+  - id: "11.6.1"
+    title: "A change and tamper-detection mechanism is deployed"
+    description: "A change-detection mechanism is deployed to alert personnel to unauthorized modification of payment pages."
+    cwes: ["CWE-345", "CWE-354"]
+
+  # Requirement 12: Support Information Security with Organizational Policies and Programs
+  - id: "12.3.2"
+    title: "A targeted risk analysis is performed for any PCI DSS requirement that provides flexibility"
+    description: "Targeted risk analyses are performed for flexible PCI DSS requirements."
+    cwes: []
+
+  - id: "12.6.2"
+    title: "The security awareness program is reviewed at least once every 12 months"
+    description: "Security awareness training is reviewed and updated annually."
+    cwes: []
+
+  - id: "12.10.2"
+    title: "At least once every 12 months, the incident response plan is tested"
+    description: "Incident response plan is tested annually."
+    cwes: []

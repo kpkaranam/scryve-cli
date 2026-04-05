@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scryve Security Report — {{.Domain}}</title>
+  <style>
+    /* ------------------------------------------------------------------ */
+    /* Reset & Base                                                         */
+    /* ------------------------------------------------------------------ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #1a1a2e;
+      --surface:   #16213e;
+      --surface2:  #0f3460;
+      --accent:    #e94560;
+      --text:      #eaeaea;
+      --muted:     #8892a4;
+      --border:    #2a2a4a;
+
+      --critical:  #c0392b;
+      --high:      #e67e22;
+      --medium:    #f39c12;
+      --low:       #27ae60;
+      --info:      #7f8c8d;
+
+      --pass:      #27ae60;
+      --fail:      #c0392b;
+      --warn:      #f39c12;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                   "Helvetica Neue", Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ------------------------------------------------------------------ */
+    /* Layout                                                               */
+    /* ------------------------------------------------------------------ */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+    /* ------------------------------------------------------------------ */
+    /* Header                                                               */
+    /* ------------------------------------------------------------------ */
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 24px 0;
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .logo {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      color: var(--text);
+    }
+    .logo span { color: var(--accent); }
+    .header-meta { text-align: right; color: var(--muted); font-size: 13px; }
+    .header-meta strong { display: block; font-size: 18px; color: var(--text); }
+
+    /* ------------------------------------------------------------------ */
+    /* Grade badge                                                          */
+    /* ------------------------------------------------------------------ */
+    .grade-section {
+      padding: 32px 0;
+      text-align: center;
+    }
+    .grade-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      font-size: 64px;
+      font-weight: 900;
+      color: #fff;
+      background: {{.GradeColor}};
+      box-shadow: 0 0 40px {{.GradeColor}}66;
+    }
+    .grade-label {
+      margin-top: 12px;
+      font-size: 15px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Summary cards                                                        */
+    /* ------------------------------------------------------------------ */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      padding: 0 0 32px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 4px solid var(--card-color, var(--muted));
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+    }
+    .card .count {
+      font-size: 40px;
+      font-weight: 800;
+      color: var(--card-color, var(--text));
+      line-height: 1;
+    }
+    .card .label {
+      margin-top: 6px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Section headings                                                     */
+    /* ------------------------------------------------------------------ */
+    .section { padding: 32px 0; }
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Email Security                                                       */
+    /* ------------------------------------------------------------------ */
+    .email-checks {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .email-check {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 140px;
+    }
+    .check-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .check-dot.pass  { background: var(--pass); }
+    .check-dot.fail  { background: var(--fail); }
+    .check-dot.warn  { background: var(--warn); }
+    .check-dot.not_tested { background: var(--info); }
+    .email-check .name  { font-weight: 600; font-size: 15px; }
+    .email-check .status { font-size: 12px; color: var(--muted); text-transform: uppercase; }
+
+    /* ------------------------------------------------------------------ */
+    /* Compliance table                                                     */
+    /* ------------------------------------------------------------------ */
+    .compliance-meta {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .pass-rate {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--pass);
+    }
+    .pass-rate.low { color: var(--fail); }
+    .pass-rate.mid { color: var(--warn); }
+
+    /* ------------------------------------------------------------------ */
+    /* Tables (shared)                                                      */
+    /* ------------------------------------------------------------------ */
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th {
+      background: var(--surface2);
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-size: 11px;
+      padding: 10px 14px;
+      text-align: left;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+    th:hover { color: var(--text); }
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* ------------------------------------------------------------------ */
+    /* Severity badges                                                      */
+    /* ------------------------------------------------------------------ */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+    .badge-critical { background: var(--critical); }
+    .badge-high     { background: var(--high); }
+    .badge-medium   { background: var(--medium); color: #1a1a2e; }
+    .badge-low      { background: var(--low); }
+    .badge-info     { background: var(--info); }
+    .badge-pass     { background: var(--pass); }
+    .badge-fail     { background: var(--fail); }
+    .badge-not_tested { background: var(--info); }
+
+    /* ------------------------------------------------------------------ */
+    /* Accordion (findings details)                                         */
+    /* ------------------------------------------------------------------ */
+    .accordion { margin-top: 4px; }
+    .accordion-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 6px;
+    }
+    .accordion-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      cursor: pointer;
+      gap: 12px;
+    }
+    .accordion-header:hover { background: rgba(255,255,255,0.02); }
+    .accordion-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .accordion-meta { color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .accordion-chevron {
+      color: var(--muted);
+      font-size: 12px;
+      transition: transform 0.2s;
+    }
+    .accordion-item.open .accordion-chevron { transform: rotate(180deg); }
+    .accordion-body {
+      display: none;
+      padding: 0 16px 16px;
+      border-top: 1px solid var(--border);
+    }
+    .accordion-item.open .accordion-body { display: block; }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    @media (max-width: 640px) { .detail-grid { grid-template-columns: 1fr; } }
+
+    .detail-block { font-size: 13px; }
+    .detail-block .dl { font-size: 11px; text-transform: uppercase;
+                         color: var(--muted); letter-spacing: 0.8px;
+                         margin-bottom: 4px; }
+    .detail-block .dd { color: var(--text); }
+
+    pre {
+      background: #0d0d1a;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px;
+      overflow-x: auto;
+      font-size: 12px;
+      color: #a8d8ea;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Stages                                                               */
+    /* ------------------------------------------------------------------ */
+    .stages-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .stage-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .stage-card .stage-name {
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+    .stage-card .stage-status {
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+    .stage-card .stage-status.completed { color: var(--pass); }
+    .stage-card .stage-status.failed    { color: var(--fail); }
+    .stage-card .stage-status.skipped   { color: var(--warn); }
+    .stage-stat { display: flex; justify-content: space-between;
+                   font-size: 12px; color: var(--muted); padding: 2px 0; }
+    .stage-stat span { color: var(--text); font-weight: 600; }
+
+    /* ------------------------------------------------------------------ */
+    /* Footer                                                               */
+    /* ------------------------------------------------------------------ */
+    .footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 20px 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .footer strong { color: var(--text); }
+
+    /* ------------------------------------------------------------------ */
+    /* Responsive                                                           */
+    /* ------------------------------------------------------------------ */
+    @media (max-width: 768px) {
+      .header-inner { flex-direction: column; align-items: flex-start; }
+      .header-meta  { text-align: left; }
+      .grade-badge  { width: 90px; height: 90px; font-size: 48px; }
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Print                                                                */
+    /* ------------------------------------------------------------------ */
+    @media print {
+      body { background: #fff; color: #000; font-size: 12px; }
+      .header, .footer { background: #f5f5f5; border-color: #ccc; }
+      .card, .stage-card, .accordion-item, .email-check {
+        background: #fff; border-color: #ccc;
+      }
+      .accordion-body { display: block !important; }
+      .accordion-chevron { display: none; }
+      th { background: #f0f0f0; color: #555; }
+      pre { background: #f9f9f9; color: #333; border-color: #ddd; }
+      a { color: inherit; }
+      :root {
+        --bg: #fff; --surface: #f9f9f9; --text: #111; --muted: #555;
+        --border: #ddd;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ======================================================== HEADER -->
+<header class="header">
+  <div class="container">
+    <div class="header-inner">
+      <div class="logo"><span>S</span>cryve</div>
+      <div class="header-meta">
+        <strong>{{.Domain}}</strong>
+        Scan date: {{.ScanDateFormatted}}<br>
+        Duration: {{.DurationFormatted}}
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ======================================================= GRADE -->
+<div class="container">
+  <div class="grade-section">
+    <div class="grade-badge">{{.Grade}}</div>
+    <div class="grade-label">Security Grade</div>
+  </div>
+
+  <!-- ================================================= SUMMARY CARDS -->
+  <div class="cards">
+    <div class="card" style="--card-color: var(--critical)">
+      <div class="count">{{.Summary.Critical}}</div>
+      <div class="label">Critical</div>
+    </div>
+    <div class="card" style="--card-color: var(--high)">
+      <div class="count">{{.Summary.High}}</div>
+      <div class="label">High</div>
+    </div>
+    <div class="card" style="--card-color: var(--medium)">
+      <div class="count">{{.Summary.Medium}}</div>
+      <div class="label">Medium</div>
+    </div>
+    <div class="card" style="--card-color: var(--low)">
+      <div class="count">{{.Summary.Low}}</div>
+      <div class="label">Low</div>
+    </div>
+    <div class="card" style="--card-color: var(--info)">
+      <div class="count">{{.Summary.Info}}</div>
+      <div class="label">Info</div>
+    </div>
+    <div class="card" style="--card-color: var(--accent)">
+      <div class="count">{{.Summary.Total}}</div>
+      <div class="label">Total</div>
+    </div>
+  </div>
+
+  <!-- ============================================= EMAIL SECURITY -->
+  {{if .EmailSecurity}}
+  <div class="section">
+    <h2 class="section-title">Email Security</h2>
+    <div class="email-checks">
+      <div class="email-check">
+        <div class="check-dot {{.EmailSecurity.SPF}}"></div>
+        <div>
+          <div class="name">SPF</div>
+          <div class="status">{{.EmailSecurity.SPF}}</div>
+        </div>
+      </div>
+      <div class="email-check">
+        <div class="check-dot {{.EmailSecurity.DKIM}}"></div>
+        <div>
+          <div class="name">DKIM</div>
+          <div class="status">{{.EmailSecurity.DKIM}}</div>
+        </div>
+      </div>
+      <div class="email-check">
+        <div class="check-dot {{.EmailSecurity.DMARC}}"></div>
+        <div>
+          <div class="name">DMARC</div>
+          <div class="status">{{.EmailSecurity.DMARC}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{end}}
+
+  <!-- ============================================= COMPLIANCE -->
+  {{if .Compliance}}
+  <div class="section">
+    <h2 class="section-title">Compliance Framework — {{.Compliance.Framework}}</h2>
+    <div class="compliance-meta">
+      <div class="pass-rate {{if lt .Compliance.PassRate 50.0}}low{{else if lt .Compliance.PassRate 80.0}}mid{{end}}">
+        {{printf "%.0f" .Compliance.PassRate}}%
+      </div>
+      <div style="color: var(--muted)">controls passing</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Control ID</th>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Findings</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{range .Compliance.Controls}}
+          <tr>
+            <td><code>{{.ID}}</code></td>
+            <td>{{.Title}}</td>
+            <td><span class="badge badge-{{.Status}}">{{.Status}}</span></td>
+            <td>{{.FindingsCount}}</td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {{end}}
+
+  <!-- ============================================= FINDINGS TABLE -->
+  <div class="section"><h2 class="section-title">Scan Pipeline</h2>
+<div class="stages-grid">{{range .Stages}}<div class="stage-card"><div class="stage-name">{{.Name}}</div><div class="stage-status {{.Status}}">{{.Status}}</div><div class="stage-stat">Duration <span>{{.DurationFormatted}}</span></div>{{range $k,$v := .Stats}}<div class="stage-stat">{{$k}} <span>{{$v}}</span></div>{{end}}</div>{{end}}</div></div>
+
+{{if .VulnFindings}}<div class="section"><h2 class="section-title">Vulnerabilities ({{len .VulnFindings}})</h2>
+<div class="table-wrap"><table><thead><tr><th>Severity</th><th>Title</th><th>Host</th><th>CWE</th><th>CVSS</th></tr></thead><tbody>
+{{range .VulnFindings}}<tr><td><span class="badge badge-{{.Severity}}">{{.Severity}}</span></td><td>{{.Title}}</td><td>{{.Host}}</td><td>{{.CWE}}</td><td>{{if .CVSS}}{{printf "%.1f" .CVSS}}{{end}}</td></tr>{{end}}
+</tbody></table></div></div>{{end}}
+
+{{if .ServiceFindings}}<div class="section"><h2 class="section-title">Discovered HTTP Services ({{len .ServiceFindings}})</h2>
+<div class="table-wrap"><table><thead><tr><th>Service</th><th>Host</th><th>Port</th><th>Technologies</th></tr></thead><tbody>
+{{range .ServiceFindings}}<tr><td>{{.Title}}</td><td>{{.Host}}</td><td>{{if .Port}}{{.Port}}{{else}}-{{end}}</td><td>{{range .Tags}}<span class="badge badge-info" style="margin-right:4px">{{.}}</span>{{end}}</td></tr>{{end}}
+</tbody></table></div></div>{{end}}
+
+{{if .SubdomainFindings}}<div class="section"><h2 class="section-title">Discovered Subdomains ({{len .SubdomainFindings}})</h2>
+<ul style="columns:3;column-gap:24px;list-style:none;padding:0">{{range .SubdomainFindings}}<li style="font-size:13px;color:var(--muted);padding:2px 0;font-family:monospace">{{.Host}}</li>{{end}}</ul></div>{{end}}
+
+</div>
+
+<footer class="footer">
+  <strong>Generated by Scryve</strong> &bull; {{.ScanDateFormatted}} &bull; All times UTC
+</footer>
+
+<script>
+  // ----------------------------------------------------------------
+  // Accordion toggle
+  // ----------------------------------------------------------------
+  function toggleAccordion(el) {
+    el.classList.toggle('open');
+  }
+
+  // ----------------------------------------------------------------
+  // Table sort (client-side, text-based)
+  // ----------------------------------------------------------------
+  var sortDir = {};
+  function sortTable(colIdx) {
+    var table = document.getElementById('findings-table');
+    var tbody = table.tBodies[0];
+    var rows  = Array.from(tbody.rows);
+    var dir   = sortDir[colIdx] = !(sortDir[colIdx]);
+
+    rows.sort(function(a, b) {
+      var aVal = a.cells[colIdx].dataset.sev
+                 ? parseInt(a.cells[colIdx].dataset.sev)
+                 : a.cells[colIdx].textContent.trim().toLowerCase();
+      var bVal = b.cells[colIdx].dataset.sev
+                 ? parseInt(b.cells[colIdx].dataset.sev)
+                 : b.cells[colIdx].textContent.trim().toLowerCase();
+      if (aVal < bVal) return dir ? -1 : 1;
+      if (aVal > bVal) return dir ?  1 : -1;
+      return 0;
+    });
+
+    rows.forEach(function(r) { tbody.appendChild(r); });
+  }
+
+  // Sort by severity (descending) on initial load.
+  sortDir[0] = true;
+  sortTable(0);
+</script>
+</body>
+</html>
