@@ -1,0 +1,91 @@
+framework: soc2-tsc
+version: "2017"
+description: "SOC 2 Trust Services Criteria (AICPA)"
+
+controls:
+  # CC1: Control Environment
+  - id: "CC1.1"
+    title: "The entity demonstrates a commitment to integrity and ethical values"
+    description: "Management and the board demonstrate commitment to integrity and ethical values."
+    cwes: []
+
+  # CC5: Control Activities
+  - id: "CC5.1"
+    title: "The entity selects and develops control activities"
+    description: "Control activities that contribute to the mitigation of risks."
+    cwes: ["CWE-284", "CWE-287"]
+
+  # CC6: Logical and Physical Access Controls
+  - id: "CC6.1"
+    title: "Logical access security software, infrastructure, and architectures"
+    description: "Logical access to systems and data is restricted and managed."
+    cwes: ["CWE-284", "CWE-287", "CWE-306", "CWE-798"]
+
+  - id: "CC6.2"
+    title: "Prior to issuing system credentials, registered and authorized users are identified"
+    description: "System access requires proper identification and authentication."
+    cwes: ["CWE-287", "CWE-306", "CWE-522"]
+
+  - id: "CC6.3"
+    title: "The entity authorizes, modifies, or removes access based on roles"
+    description: "Access permissions are role-based and properly managed."
+    cwes: ["CWE-284", "CWE-269", "CWE-250"]
+
+  - id: "CC6.6"
+    title: "The entity implements logical access security measures to protect against threats"
+    description: "Security measures protect against unauthorized access from outside boundaries."
+    cwes: ["CWE-79", "CWE-89", "CWE-78", "CWE-94", "CWE-918"]
+
+  - id: "CC6.7"
+    title: "The entity restricts the transmission of data to authorized users"
+    description: "Data transmission is restricted and protected."
+    cwes: ["CWE-319", "CWE-311", "CWE-523"]
+
+  - id: "CC6.8"
+    title: "The entity implements controls to prevent or detect unauthorized software"
+    description: "Controls prevent or detect introduction of unauthorized software."
+    cwes: ["CWE-502", "CWE-94", "CWE-829"]
+
+  # CC7: System Operations
+  - id: "CC7.1"
+    title: "Detection and monitoring procedures are in place"
+    description: "Anomalies and security events are detected and reported."
+    cwes: ["CWE-778", "CWE-223"]
+
+  - id: "CC7.2"
+    title: "The entity monitors system components for anomalies"
+    description: "System components are monitored for anomalous activity."
+    cwes: ["CWE-778", "CWE-117"]
+
+  - id: "CC7.3"
+    title: "Security events are evaluated to determine impact"
+    description: "Security events are analyzed and evaluated."
+    cwes: []
+
+  # CC8: Change Management
+  - id: "CC8.1"
+    title: "The entity authorizes, designs, develops, and implements changes"
+    description: "Changes to infrastructure, data, software, and procedures are authorized."
+    cwes: ["CWE-16", "CWE-1188"]
+
+  # A1: Availability
+  - id: "A1.1"
+    title: "The entity maintains, monitors, and evaluates current processing capacity"
+    description: "Processing capacity and usage is monitored."
+    cwes: []
+
+  - id: "A1.2"
+    title: "Environmental protections, software, and recovery infrastructure are designed"
+    description: "Recovery mechanisms support system availability objectives."
+    cwes: ["CWE-400", "CWE-770"]
+
+  # C1: Confidentiality
+  - id: "C1.1"
+    title: "Confidential information is identified and classified"
+    description: "The entity identifies and classifies confidential information."
+    cwes: ["CWE-200", "CWE-532"]
+
+  - id: "C1.2"
+    title: "Confidential information is disposed of properly"
+    description: "The entity disposes of confidential information to meet objectives."
+    cwes: ["CWE-459", "CWE-212"]

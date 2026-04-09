@@ -1,0 +1,103 @@
+framework: iso27001-annexa
+version: "2022"
+description: "ISO/IEC 27001:2022 Annex A Controls"
+
+controls:
+  # A.5: Organizational Controls
+  - id: "A.5.1"
+    title: "Policies for information security"
+    description: "A set of policies for information security shall be defined and approved."
+    cwes: []
+
+  # A.6: People Controls
+  - id: "A.6.1"
+    title: "Screening"
+    description: "Background verification checks shall be carried out."
+    cwes: []
+
+  # A.7: Physical Controls
+  - id: "A.7.1"
+    title: "Physical security perimeters"
+    description: "Security perimeters shall be defined to protect areas containing information."
+    cwes: []
+
+  # A.8: Technological Controls
+  - id: "A.8.1"
+    title: "User endpoint devices"
+    description: "Information stored on, processed by, or accessible via user endpoint devices shall be protected."
+    cwes: ["CWE-311", "CWE-312"]
+
+  - id: "A.8.2"
+    title: "Privileged access rights"
+    description: "The allocation and use of privileged access rights shall be restricted and managed."
+    cwes: ["CWE-269", "CWE-250", "CWE-284"]
+
+  - id: "A.8.3"
+    title: "Information access restriction"
+    description: "Access to information shall be restricted in accordance with the access control policy."
+    cwes: ["CWE-284", "CWE-287", "CWE-306"]
+
+  - id: "A.8.4"
+    title: "Access to source code"
+    description: "Read and write access to source code shall be appropriately managed."
+    cwes: ["CWE-284"]
+
+  - id: "A.8.5"
+    title: "Secure authentication"
+    description: "Secure authentication technologies and procedures shall be established."
+    cwes: ["CWE-287", "CWE-522", "CWE-798", "CWE-521"]
+
+  - id: "A.8.7"
+    title: "Protection against malware"
+    description: "Protection against malware shall be implemented."
+    cwes: ["CWE-502", "CWE-94", "CWE-829"]
+
+  - id: "A.8.8"
+    title: "Management of technical vulnerabilities"
+    description: "Information about technical vulnerabilities shall be obtained and evaluated."
+    cwes: ["CWE-16", "CWE-1188"]
+
+  - id: "A.8.9"
+    title: "Configuration management"
+    description: "Configurations, including security configurations, shall be defined and managed."
+    cwes: ["CWE-16", "CWE-1188", "CWE-532"]
+
+  - id: "A.8.10"
+    title: "Information deletion"
+    description: "Information stored in systems shall be deleted when no longer required."
+    cwes: ["CWE-459", "CWE-212"]
+
+  - id: "A.8.12"
+    title: "Data leakage prevention"
+    description: "Data leakage prevention measures shall be applied."
+    cwes: ["CWE-200", "CWE-532", "CWE-209"]
+
+  - id: "A.8.20"
+    title: "Networks security"
+    description: "Networks and network devices shall be secured, managed, and controlled."
+    cwes: ["CWE-923", "CWE-284"]
+
+  - id: "A.8.21"
+    title: "Security of network services"
+    description: "Security mechanisms, service levels, and management requirements of network services shall be identified."
+    cwes: ["CWE-319", "CWE-311", "CWE-523"]
+
+  - id: "A.8.24"
+    title: "Use of cryptography"
+    description: "Rules for the effective use of cryptography shall be defined and implemented."
+    cwes: ["CWE-326", "CWE-327", "CWE-319", "CWE-311"]
+
+  - id: "A.8.25"
+    title: "Secure development life cycle"
+    description: "Rules for the secure development of software and systems shall be established."
+    cwes: ["CWE-79", "CWE-89", "CWE-78", "CWE-94", "CWE-22"]
+
+  - id: "A.8.26"
+    title: "Application security requirements"
+    description: "Information security requirements shall be identified and specified."
+    cwes: ["CWE-79", "CWE-89", "CWE-918", "CWE-502"]
+
+  - id: "A.8.28"
+    title: "Secure coding"
+    description: "Secure coding principles shall be applied to software development."
+    cwes: ["CWE-79", "CWE-89", "CWE-78", "CWE-94", "CWE-22", "CWE-502", "CWE-918"]

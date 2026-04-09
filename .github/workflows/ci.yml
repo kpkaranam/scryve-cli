@@ -1,70 +1,91 @@
 name: CI
 
 on:
-  push:
-    branches: [master, main]
   pull_request:
+    branches: [master]
+  push:
+    branches: [master]
 
 jobs:
-  lint:
-    name: Lint
+  go:
+    name: Go Build & Test
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: scryve
+          POSTGRES_PASSWORD: scryve_test
+          POSTGRES_DB: scryve_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U scryve"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-go@v5
         with:
-          go-version: "1.22"
-          cache: true
+          go-version: "1.24"
 
-      - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v4
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Build
+        run: make build
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v6
         with:
           version: latest
 
-  test:
-    name: Test
+      - name: Test
+        run: make test
+        env:
+          DATABASE_URL: postgres://scryve:scryve_test@localhost:5432/scryve_test?sslmode=disable
+          SCRYVE_DB_URL: postgres://scryve:scryve_test@localhost:5432/scryve_test?sslmode=disable
+          SCRYVE_REDIS_URL: redis://localhost:6379/0
+
+  web:
+    name: Next.js Build & Lint
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-node@v4
         with:
-          go-version: "1.22"
-          cache: true
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: web/package-lock.json
 
-      - name: Run tests with race detector and coverage
-        run: go test -cover -coverprofile=coverage.out -timeout 120s ./...
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Upload coverage artifact
-        if: github.event_name == 'push'
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage
-          path: coverage.out
+      - name: Type check
+        run: npm run type-check
 
-  build:
-    name: Build (${{ matrix.goos }}/${{ matrix.goarch }})
-    needs: [lint, test]
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        goos: [linux, darwin, windows]
-        goarch: [amd64, arm64]
-    steps:
-      - uses: actions/checkout@v4
+      - name: Lint
+        run: npm run lint
 
-      - uses: actions/setup-go@v5
-        with:
-          go-version: "1.22"
-          cache: true
-
-      - name: Build binary
-        run: |
-          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} \
-          CGO_ENABLED=0 \
-          go build \
-            -trimpath \
-            -ldflags="-s -w" \
-            -o scryve-${{ matrix.goos }}-${{ matrix.goarch }} .
-
+      - name: Build
+        run: npx next build
+        env:
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_placeholder
+          NEXT_PUBLIC_API_URL: http://localhost:8080
