@@ -91,9 +91,3 @@ Scryve maps scan findings to these frameworks (CLI pass/fail output):
 ## License
 
 MIT — see [LICENSE](LICENSE)
-
-## Enterprise
-
-Need dashboards, scheduled scans, PDF compliance reports, team collaboration, or SSO?
-
-Check out [Scryve Platform](https://scryve.io) — the enterprise security operations platform built on the same engine.
